@@ -7,6 +7,7 @@ from tensorflow.keras.optimizers import SGD, Adam
 from tensorflow.keras.layers import *
 from Encoder import *
 import pandas as pd
+from tensorflow.keras.utils import plot_model
 
 
 
@@ -43,7 +44,7 @@ print(embeddings)
 
 mask_inputs = padding_mask(inputs)
 
-out_seq = Encoder(2, 128, 4, 256, maxlen)(embeddings, mask_inputs, False)
+out_seq = Encoder(2, 128, 4, 256, maxlen)([embeddings, mask_inputs])
 
 print("\n"*2)
 print("out_seq:")
@@ -56,16 +57,15 @@ print("out_seq:")
 print(out_seq)
 
 out_seq = Dropout(0.3)(out_seq)
-outputs = Dense(64, activation='relu')(out_seq)
-
 out_seq = Dropout(0.3)(out_seq)
-outputs = Dense(16, activation='relu')(out_seq)
-
 out_seq = Dropout(0.3)(out_seq)
+
 outputs = Dense(2, activation='softmax')(out_seq)
 
 model = Model(inputs=inputs, outputs=outputs)
 print(model.summary())
+
+plot_model(model, to_file='transformer_model.png')
 
 
 opt = Adam(lr=0.0002, decay=0.00001)
